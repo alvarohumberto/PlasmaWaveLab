@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.DS_Store
+.vscode/
+.idea/
+results/
+
+# LaTeX build files
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.out
+manuscript/*.fls
+manuscript/*.fdb_latexmk
+manuscript/*.spl
+manuscript/*.synctex.gz

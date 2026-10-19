@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use PlasmaWaveLab, please cite the software release."
+title: "PlasmaWaveLab: Sagdeev pseudopotential analysis and spectral KdV simulation of ion-acoustic solitary waves"
+type: software
+authors:
+  - family-names: Salas
+    given-names: Alvaro H.
+    orcid: https://orcid.org/0000-0001-9343-6062
+version: 0.3.0
+date-released: 2026-10-19
+license: MIT
+repository-code: https://github.com/alvarohumberto/PlasmaWaveLab
+abstract: "Verified Python package for Sagdeev pseudopotential analysis (including the critical Mach number) and Fourier integrating-factor RK4 simulation of the ion-acoustic KdV equation, linked through their small-amplitude limit."

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plasmawavelab"
+version = "0.3.0"
+description = "Open-source Sagdeev ion-acoustic solitary waves and Fourier KdV benchmarks"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Alvaro H. Salas", email = "ahsalass@unal.edu.co"}]
+keywords = ["plasma physics", "Sagdeev potential", "ion acoustic solitons", "KdV"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+plasmawavelab = "plasmawavelab.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
