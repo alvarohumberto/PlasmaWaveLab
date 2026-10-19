@@ -10,7 +10,7 @@
   two-soliton phase shifts, invariant drift) and writes `summary.json`.
 - CLI: new options `--xi-max`, `--length`, `--dt`, `--amplitude`, `--alpha`,
   `--beta`, `--version`; KdV error now reported in the maximum norm.
-- Tests: 11 new verification tests, including two-soliton phase shifts (21 in total); CI also runs the
+- Tests: 11 new verification tests and a two-soliton phase-shift test (21 in total); CI also runs the
   verification script.
 - Manuscript moved to Elsevier `elsarticle` with SoftwareX OSP structure.
 
