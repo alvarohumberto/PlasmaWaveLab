@@ -1,93 +1,63 @@
-# PlasmaWaveLab
+# PlasmaWaveLab — Wolfram Language (Mathematica) edition
 
-[![Python tests](https://github.com/alvarohumberto/PlasmaWaveLab/actions/workflows/tests.yml/badge.svg)](https://github.com/alvarohumberto/PlasmaWaveLab/actions/workflows/tests.yml)
+A Wolfram Language implementation of the same models and algorithms as the
+Python package in `src/plasmawavelab/`, for users who work in Mathematica.
 
-**PlasmaWaveLab v0.3.0** is an open-source, tested Python package for
-ion-acoustic solitary waves at two levels of description: the fully nonlinear
-Sagdeev pseudopotential of the cold-ion/Boltzmann-electron plasma, and its
-weakly nonlinear Korteweg–de Vries (KdV) limit, solved with a Fourier
-integrating-factor RK4 scheme. The two are linked through their explicit
-small-amplitude mapping, so each module checks the other.
+| File | Contents |
+|---|---|
+| `PlasmaWaveLab.wl` | Package: Sagdeev model, critical Mach number, soliton amplitude and profile, small-amplitude KdV limit, IF-RK4 Fourier KdV solver, invariants, exact two-soliton phase shifts |
+| `Verification.wls` | Reproduces the manuscript's verification results and checks them against the Python reference values (PASS/FAIL) |
 
-**Author:** Alvaro H. Salas, FIZMAKO Research Group, Universidad Nacional de
-Colombia, Sede Manizales. ORCID: https://orcid.org/0000-0001-9343-6062
+Requires Mathematica / Wolfram Engine 12.0 or newer (no extra packages).
 
-## Features
+## Quick start
 
-- Sagdeev pseudopotential with domain checks, critical Mach number
-  `M_c = 1.5852…`, soliton amplitude and symmetric profile.
-- Small-amplitude bridge: `ion_acoustic_kdv_coefficients()` (α = 1, β = 1/2)
-  and `small_amplitude_soliton()`.
-- Periodic KdV solver with Fourier differentiation, 2/3 de-aliasing and
-  fourth-order integrating-factor Runge–Kutta; exact solitons; spectral
-  mass / L² / Hamiltonian diagnostics.
-- `examples/verification.py` reproduces every figure and number in the
-  SoftwareX manuscript (see [docs/VALIDATION.md](docs/VALIDATION.md)).
-- 21 pytest tests, GitHub Actions CI on Python 3.10–3.13, CLI with CSV/PNG output.
+```mathematica
+Get["path/to/PlasmaWaveLab/mathematica/PlasmaWaveLab.wl"]
 
-## Quick start (Windows PowerShell)
+CriticalMach[]                       (* 1.5852010652... *)
+PeakPotential[1.2]                   (* 0.5243854849... *)
+prof = SolitaryProfile[1.2];
+ListLinePlot[Transpose[{prof["Xi"], prof["Phi"]}]]
 
-Install Python 3.10+ and unzip the archive. In the extracted `PlasmaWaveLab`
-folder run:
+(* KdV soliton propagation *)
+x = Most @ Subdivide[-60., 60., 512];
+{t, u} = KdVPropagate[KdVSoliton[x, 0.], "Length" -> 120., "FinalTime" -> 2.];
+KdVInvariants[Last[u], 120./512]
 
-```powershell
-py -m pip install -e ".[test]"
-py -m pytest -q
-py -m plasmawavelab sagdeev --mach 1.2 --output results/sagdeev
-py -m plasmawavelab kdv --n 512 --time 2 --output results/kdv
-py examples/verification.py --output results/verification
+(* small-amplitude limit: Sagdeev soliton vs ion-acoustic KdV soliton *)
+IonAcousticKdVCoefficients[]         (* <|"Alpha" -> 1, "Beta" -> 1/2|> *)
+SmallAmplitudeSoliton[0., 1.01]      (* 3 (M-1) = 0.03 *)
 ```
 
-Linux/macOS: replace `py` with `python3` and run `python3 -m pip install -e '.[test]'`. Outputs are created under `results/`.
+## Verification
 
-For the entry-point CLI you can also run:
+From a terminal:
 
 ```bash
-plasmawavelab sagdeev --mach 1.2
-plasmawavelab kdv --time 2
+wolframscript -file mathematica/Verification.wls
 ```
 
-## API
+or open `Verification.wls` in Mathematica and choose *Evaluation → Evaluate
+Notebook*. Each check prints `PASS`/`FAIL`. Figures, a CSV table and
+`summary.json` are written to `mathematica/output/`.
 
-```python
-import numpy as np
-from plasmawavelab import (critical_mach, peak_potential, solitary_profile,
-                           kdv_soliton, kdv_propagate, kdv_invariants)
+## Correspondence with the Python API
 
-print(critical_mach())          # 1.5852010652...
-print(peak_potential(1.2))      # 0.5243854849...
-x = np.linspace(-60, 60, 512, endpoint=False)
-u0 = kdv_soliton(x, t=0)
-times, states = kdv_propagate(u0, length=120, final_time=2)
-print(kdv_invariants(states[-1], dx=120/512))
-```
-
-## Repository layout
-
-| Location | Contents |
+| Python (`plasmawavelab`) | Wolfram Language |
 |---|---|
-| `src/plasmawavelab/` | Open-source Python package and CLI |
-| `tests/` | Physics and numerical regression tests |
-| `.github/workflows/` | Automatic Python tests on GitHub |
-| `docs/THEORY.md` | Governing assumptions and numerics |
-| `docs/VALIDATION.md` | Validation evidence and outstanding work |
-| `manuscript/` | SoftwareX manuscript (LaTeX source + PDF) |
-| `docs/GITHUB_UPLOAD.md` | GitHub publishing instructions |
-| `figures/` | CLI outputs and `verification/` (manuscript figures) |
-| `examples/` | `run_both.py` and `verification.py` |
-| `CITATION.cff` | Citation metadata |
-| `LICENSE` | MIT license |
+| `sagdeev(phi, mach)` | `SagdeevPotential[phi, M]` |
+| `sagdeev_prime(phi, mach)` | `SagdeevPrime[phi, M]` |
+| `critical_mach()` | `CriticalMach[]` |
+| `peak_potential(mach)` | `PeakPotential[M]` |
+| `solitary_profile(mach, xi_max, points)` | `SolitaryProfile[M, "XiMax" -> …, "Points" -> …]` |
+| `small_amplitude_soliton(xi, mach)` | `SmallAmplitudeSoliton[xi, M]` |
+| `ion_acoustic_kdv_coefficients()` | `IonAcousticKdVCoefficients[]` |
+| `kdv_soliton(x, t, amplitude, alpha, beta, center)` | `KdVSoliton[x, t, "Amplitude" -> …, "Alpha" -> …, "Beta" -> …, "Center" -> …]` |
+| `kdv_propagate(u0, length, final_time, dt, alpha, beta, save_every)` | `KdVPropagate[u0, "Length" -> …, "FinalTime" -> …, "TimeStep" -> …, "Alpha" -> …, "Beta" -> …, "SaveEvery" -> …]` |
+| `kdv_invariants(u, dx, alpha, beta)` | `KdVInvariants[u, dx, "Alpha" -> …, "Beta" -> …]` |
+| — | `KdVTwoSolitonPhaseShifts[A1, A2]` |
 
-## Scientific scope and limitations
-
-One-dimensional, unmagnetised, collisionless plasma with cold ions and
-Boltzmann electrons; positive-polarity solitons only. Not a PIC, kinetic,
-magnetised, multi-species or dusty-plasma code. Sagdeev far-field tails are
-truncated at 10⁻⁵ φ_m. The KdV solver is periodic and conserves mass to
-round-off; L² norm and Hamiltonian drift is small but non-zero.
-
-See [theory](docs/THEORY.md) and [verification](docs/VALIDATION.md).
-
-## Citation and license
-
-Citation metadata: [`CITATION.cff`](CITATION.cff). MIT-licensed, see [`LICENSE`](LICENSE).
+The FFT convention (`FourierParameters -> {1, -1}`), wavenumber ordering,
+two-thirds mask and IF-RK4 stages are identical to the Python code, so results
+agree to within round-off and solver-tolerance differences.
